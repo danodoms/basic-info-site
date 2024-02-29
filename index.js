@@ -1,31 +1,25 @@
-var http = require("http");
-var url = require("url");
-var fs = require("fs");
+// var http = require("http");
+// var url = require("url");
+// var fs = require("fs");
 
-http
-  .createServer(function (req, res) {
-    var q = url.parse(req.url, true);
-    var errorPagePath = "./404.html";
-    var filename = "." + q.pathname + ".html";
-    console.log("pathname: ", q.pathname);
+const express = require("express");
+const app = express();
+const port = 8080;
 
-    fs.readFile(filename, function (err, data) {
-      if (err) {
-        const errorPage = fs.readFileSync(errorPagePath, (err, data) => {
-          if (err) {
-            return console.log("404 is empty");
-          } else {
-            return data;
-          }
-        });
+app.use(express.static("public"));
 
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.write(errorPage);
-        return res.end();
-      }
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.write(data);
-      return res.end();
-    });
-  })
-  .listen(8080);
+app.get("/about", (req, res) => {
+  res.sendFile(__dirname + "/public/about.html");
+});
+
+app.get("/contact-me", (req, res) => {
+  res.sendFile(__dirname + "/public/contact-me.html");
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile(__dirname + "/public/404.html");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
